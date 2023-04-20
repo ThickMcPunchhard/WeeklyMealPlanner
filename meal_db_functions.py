@@ -127,7 +127,7 @@ def add_recipe():
     ########################################################
     r_name_input = str(input('Recipe name:'))
     r_instr_input = str(input('Instructions:'))
-    rec_check = cur.execute("""SELECT
+    rec_check = cur.execute(f"""SELECT
             1
         FROM
             recipes
@@ -149,6 +149,7 @@ def add_recipe():
         conn.commit()
     if rec_check:
         print("Recipe already exists")
+        
     #insert ingredients
     ####################################################
 ##    ing_lst_input = []
