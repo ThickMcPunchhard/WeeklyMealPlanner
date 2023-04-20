@@ -3,6 +3,7 @@ import sqlite3
 import pandas as pd
 
 conn = sqlite3.connect('meals.db')
+cur = conn.cursor()
 
 def print_recipe(rec_id):
     """Print recipes"""
@@ -120,13 +121,74 @@ def show_mealplan():
     full_plan = full_plan.sort_values('DOW')
     print(full_plan)
     
+def add_recipe():
+    """Add recipe to database"""
+    #insert recipe name + instructions
+    ########################################################
+    r_name_input = str(input('Recipe name:'))
+    r_instr_input = str(input('Instructions:'))
+    rec_check = cur.execute("""SELECT
+            1
+        FROM
+            recipes
+        WHERE
+            recipes.r_name = '{r_name_input}';""").fetchall()
+    select_ind_num = """SELECT MAX(r_id)
+        FROM
+            recipes"""
+    last_ind_num = cur.execute(select_ind_num).fetchall()
+    new_ind = int(last_ind_num[0][0])+1
+    if not rec_check:
+        rec_insert_qry = f"""INSERT INTO
+                recipes
+            VALUES
+                ({new_ind},
+                '{r_name_input}',
+                '{r_instr_input}');"""
+        recipe_insert_record = cur.execute(rec_insert_qry)
+        conn.commit()
+    if rec_check:
+        print("Recipe already exists")
+    #insert ingredients
+    ####################################################
+##    ing_lst_input = []
+        #make list of ings to insert
+        #check if ing name already exists
+    
+##    ing_insert_qry = f"""INSERT INTO ingredients
+##            VALUES '{ing_lst_input}';"""
+    
+    #insert uoms
+    ######################################################
+##    uoms = []
+        #check if uom exists
+        #if not exist, then insert    
+##    uom_insert_qry = f"""INSERT INTO uom
+##            VALUES '{uoms}';"""
+    
+    #match all the insertion records to their IDs with QTY
+    #######################################################
+    
+    #insert those IDs and QTY into the join table
+    #######################################################
+
+    #DONE-validation
+    ######################################################
+    strng_rec = """SELECT * from recipes"""
+    strng_ing = """SELECT * from ingredients"""
+    strng_uom = """SELECT * from uom"""
+    strng_r_i_join = """SELECT * from r_i_join"""
+    tablecheck_1 = pd.read_sql(strng_rec,conn)
+    tablecheck_2 = pd.read_sql(strng_ing,conn)
+    tablecheck_3 = pd.read_sql(strng_uom,conn)
+    tablecheck_4 = pd.read_sql(strng_r_i_join,conn)
+    print(tablecheck_1)
+    print(tablecheck_2)
+    print(tablecheck_3)
+    print(tablecheck_4)
+    
 def change_meal():
     pass
-
-def add_recipe():    
-    r_name_input = input('Recipe name:')
-    rec_insert_qry = f"""INSERT INTO recipes
-            VALUES '{r_name_input}';"""
 
 #WIP 
 ########################
