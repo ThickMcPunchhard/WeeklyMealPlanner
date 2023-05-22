@@ -80,46 +80,6 @@ def search_cookbook():
     for ind in search_rec.index:
         rid = search_rec['r_id'][ind]
         print_recipe(rid)
-        
-def show_mealplan():
-    """Print out the week's meal plan"""
-    dinnerplan_qry = """SELECT
-        dow.dow AS DOW,
-        recipes.r_name AS Dinner         
-    FROM
-        dow
-        LEFT JOIN recipes ON recipes.r_id = dow.r_id
-    WHERE dow.meal =='Dinner';"""
-    lunchplan_qry = """SELECT
-        dow.dow AS DOW,
-        recipes.r_name AS Lunch
-    FROM
-        dow
-        LEFT JOIN recipes ON recipes.r_id = dow.r_id
-    WHERE dow.meal =='Lunch';"""
-    breakfastplan_qry = """SELECT
-        dow.dow AS DOW,
-        recipes.r_name AS Breakfast
-    FROM
-        dow
-        LEFT JOIN recipes ON recipes.r_id = dow.r_id
-    WHERE dow.meal =='Breakfast';"""
-    dinner_plan = pd.read_sql(dinnerplan_qry,conn) 
-    lunch_plan = pd.read_sql(lunchplan_qry,conn)    
-    breakfast_plan = pd.read_sql(breakfastplan_qry,conn)
-
-    half_plan = breakfast_plan.merge(lunch_plan, on='DOW')
-    full_plan = half_plan.merge(dinner_plan,on='DOW')
-    cats = ['mon',
-            'tue',
-            'wed',
-            'thu',
-            'fri',
-            'sat',
-            'sun']
-    full_plan['DOW'] = pd.Categorical(full_plan['DOW'],categories=cats, ordered=True)
-    full_plan = full_plan.sort_values('DOW')
-    print(full_plan)
     
 def add_recipe():
     """Add recipe to database"""
@@ -259,13 +219,19 @@ def add_recipe():
             list_names = list(zip(*ing_lst_input))[2]
             return list_names
                     
-        add_ing_name()
+        add_ing_name()        
         add_uom_name()
+        print("ing_data input pre-zip")
+        print(return_ing_id())
+        print(return_uom_id())
+        print(return_qty())
 
-        ing_data = zip(return_ing_id(),return_uom_id(),return_qty())        
+        ing_data = list(zip(return_ing_id(),return_uom_id(),return_qty()))
         return ing_data 
         
     def add_to_join(rid_int,ing_data):
+        print(rid_int)
+        print("ing_data input", ing_data)
         """Insert recipe into join table"""  
         select_j_ind_num = """SELECT MAX(j_id)
                         FROM
@@ -304,20 +270,76 @@ def add_recipe():
         print(tablecheck_1)
         print(tablecheck_2)
         print(tablecheck_3)
-        print(tablecheck_4)      
- 
+        print(tablecheck_4)    
 
     add_to_join(add_r_name(),add_ingredients())
     add_validation()
     
-def change_meal():
+def show_mealplan():
+    """Print out the week's meal plan"""
+    dinnerplan_qry = """SELECT
+        dow.dow AS DOW,
+        recipes.r_name AS Dinner         
+    FROM
+        dow
+        LEFT JOIN recipes ON recipes.r_id = dow.r_id
+    WHERE dow.meal =='Dinner';"""
+    lunchplan_qry = """SELECT
+        dow.dow AS DOW,
+        recipes.r_name AS Lunch
+    FROM
+        dow
+        LEFT JOIN recipes ON recipes.r_id = dow.r_id
+    WHERE dow.meal =='Lunch';"""
+    breakfastplan_qry = """SELECT
+        dow.dow AS DOW,
+        recipes.r_name AS Breakfast
+    FROM
+        dow
+        LEFT JOIN recipes ON recipes.r_id = dow.r_id
+    WHERE dow.meal =='Breakfast';"""
+    dinner_plan = pd.read_sql(dinnerplan_qry,conn) 
+    lunch_plan = pd.read_sql(lunchplan_qry,conn)    
+    breakfast_plan = pd.read_sql(breakfastplan_qry,conn)
+
+    half_plan = breakfast_plan.merge(lunch_plan, on='DOW')
+    full_plan = half_plan.merge(dinner_plan,on='DOW')
+    cats = ['mon',
+            'tue',
+            'wed',
+            'thu',
+            'fri',
+            'sat',
+            'sun']
+    full_plan['DOW'] = pd.Categorical(full_plan['DOW'],categories=cats, ordered=True)
+    full_plan = full_plan.sort_values('DOW')
+    print(full_plan)
+
+def clear_all_meals():
+    clear_meals_statement = """UPDATE dow SET r_id = NULL;"""
+    conn.execute(clear_meals_statement)
+    
+def set_single_meal():
+    ##Define meal
+    ##Define DOW
+    ##Define new recipe
+    ##Find that record and update
     pass
+
+def random_meal_plan():
+    pass
+
+
+#Complete 
+########################
+##print_toc()
+##print_cookbook()
+##add_recipe()
+##search_cookbook()
+##clear_all_meals()
+##show_mealplan()
 
 #WIP 
 ########################
-add_recipe()
-change_meal()
-##print_toc()
-##print_cookbook()
-##search_cookbook()
-##show_mealplan()
+set_single_meal()
+random_meal_plan()
